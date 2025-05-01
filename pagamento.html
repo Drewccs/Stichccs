@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pagamento - Stichccs</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <h1>Pagamento via Pix</h1>
+    <p id="produto-info">Carregando produto...</p>
+
+    <div class="pix-area">
+      <h3>📱 Escaneie o QR Code ou use o código:</h3>
+      <img id="qrcode" src="" alt="QR Code Pix" style="max-width: 250px; margin-bottom: 10px;" />
+      <pre id="pix-copia-e-cola"></pre>
+    </div>
+
+    <button id="confirmar">Já paguei</button>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const produto = params.get("produto");
+
+    const produtosPix = {
+      "cc-stich": {
+        nome: "cc's stich",
+        qr: "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=chavepix-cc-stich",
+        chave: "chavepix-cc-stich"
+      },
+      "cc-promo": {
+        nome: "cc's promo",
+        qr: "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=chavepix-cc-promo",
+        chave: "chavepix-cc-promo"
+      }
+    };
+
+    if (produto in produtosPix) {
+      const dados = produtosPix[produto];
+      document.getElementById("produto-info").textContent = `Produto: ${dados.nome}`;
+      document.getElementById("qrcode").src = dados.qr;
+      document.getElementById("pix-copia-e-cola").textContent = dados.chave;
+
+      document.getElementById("confirmar").onclick = () => {
+        let compras = JSON.parse(localStorage.getItem("compras")) || [];
+        if (!compras.includes(produto)) {
+          compras.push(produto);
+          localStorage.setItem("compras", JSON.stringify(compras));
+        }
+        window.location.href = "index.html";
+      };
+    } else {
+      document.getElementById("produto-info").textContent = "Produto não encontrado.";
+      document.getElementById("confirmar").disabled = true;
+    }
+  </script>
+</body>
+</html>
